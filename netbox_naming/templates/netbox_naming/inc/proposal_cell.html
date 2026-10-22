@@ -1,0 +1,6 @@
+<td>
+  {% if proposal %}
+    <code>{{ proposal.value }}</code>
+    {% if proposal.conflict %}<span class="badge text-bg-danger">Already taken</span>{% endif %}
+  {% else %}—{% endif %}
+</td>

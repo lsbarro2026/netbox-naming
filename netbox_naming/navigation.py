@@ -14,8 +14,14 @@ conventions_item = PluginMenuItem(
     ),
 )
 
+generate_item = PluginMenuItem(
+    link="plugins:netbox_naming:generate",
+    link_text="Generate names",
+    permissions=["netbox_naming.view_namingconvention", "dcim.view_device"],
+)
+
 menu = PluginMenu(
     label="Naming",
-    groups=(("Conventions", (conventions_item,)),),
+    groups=(("Conventions", (conventions_item,)), ("Generator", (generate_item,))),
     icon_class="mdi mdi-label-outline",
 )
