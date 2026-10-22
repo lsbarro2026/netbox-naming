@@ -16,18 +16,7 @@
 - **Plan:** full.
 - **Source:** /todo-expanded, 2026-10-22.
 - **Route:** judgment
-### FEAT-9 — core: NamingConvention and NamingCounter models and migration
-- **What:** Implement breakdown B3 of `docs/plan/netbox-naming/core/plan.md`: `choices.py`, `NamingConvention(PrimaryModel)` with the plan's fields, constraints and `clean()` rules, `NamingCounter(models.Model)`, and `0001_initial` generated with `makemigrations` in the dev container.
-- **Binding plan:** plan.md is binding. Record any departure under its Deviations section. The plan docs stay in place; never delete or archive them.
-- **Why:** `management-ui` and `name-generator` build against this model (overview Contracts).
-- **Files:** `netbox_naming/choices.py`, `netbox_naming/models.py`, `netbox_naming/migrations/0001_initial.py`, `netbox_naming/tests/test_models.py`.
-- **Docs:** docs/plan/netbox-naming/core/plan.md#b3-models-and-migration
-- **Acceptance:** `makemigrations --check` reports no changes; model validation tests (each `clean()` rule, both constraints, PROTECT on role delete) pass.
-- **Out of scope:** engine, forms/views.
-- **Plan:** full.
-- **Route:** standard
-
-### FEAT-10 — [BLOCKED: FEAT-9] core: Naming engine preview, allocate, counters and nesting
+### FEAT-10 — core: Naming engine preview, allocate, counters and nesting
 - **What:** Implement breakdown B4 of `docs/plan/netbox-naming/core/plan.md`: `NamingContext`, `Proposal`, `find_convention`, `preview` (no locks, no writes) and `allocate` (one transaction, `get_or_create` + `select_for_update` on each counter, dependency first), the hybrid scan-plus-counter numbering, collision skipping in each field's uniqueness domain, and nesting.
 - **Binding plan:** plan.md is binding. Record any departure under its Deviations section. The plan docs stay in place; never delete or archive them. This is the last core implementation item: set plan.md's Status to **Implemented**.
 - **Why:** `name-generator` (FEAT-5) consumes the engine API; it is the core of the request's 'generate the next 5 AP names'.
@@ -38,7 +27,7 @@
 - **Plan:** full.
 - **Route:** judgment
 
-### FEAT-11 — [BLOCKED: FEAT-9] management-ui: Naming convention CRUD pages and menu
+### FEAT-11 — management-ui: Naming convention CRUD pages and menu
 - **What:** Implement breakdown M1 of `docs/plan/netbox-naming/management-ui/plan.md`: filterset, model/filter/import forms (plain template input, no preview fieldset yet), table, generic list/detail/edit/delete/bulk-import/bulk-delete views with the declared list `actions`, `SimpleLayout` detail page without the sample panel, `urls.py`, the "Naming" `PluginMenu`, and `search.py`.
 - **Binding plan:** plan.md is binding. Record any departure under its Deviations section. The plan docs stay in place; never delete or archive them.
 - **Why:** this is the plugin's own page where users store and manage naming conventions (overview Request).
