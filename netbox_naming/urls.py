@@ -13,4 +13,5 @@ urlpatterns = [
         "namingconvention/<int:pk>/",
         include(get_model_urls("netbox_naming", "namingconvention")),
     ),
+    path("preview/", views.TemplatePreviewView.as_view(), name="namingconvention_preview"),
 ]

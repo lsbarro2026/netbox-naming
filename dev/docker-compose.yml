@@ -18,6 +18,7 @@ x-netbox: &netbox
     REDIS_CACHE_HOST: redis
     REDIS_CACHE_DATABASE: "1"
     SECRET_KEY: dev-only-secret-key-dev-only-secret-key-dev-only-secret-key
+    API_TOKEN_PEPPER_1: dev-only-pepper-dev-only-pepper-dev-only-pepper-dev-only-pepper-dev
     ALLOWED_HOSTS: "*"
     DEBUG: "false"
     DEVELOPER: "true"

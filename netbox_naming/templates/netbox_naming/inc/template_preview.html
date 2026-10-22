@@ -1,0 +1,26 @@
+{% if missing_permission %}
+  <div class="alert alert-warning mb-0">Preview needs the <code>{{ missing_permission }}</code> permission.</div>
+{% else %}
+  {% if preview.error_span %}
+    <p class="mb-1"><code>{{ preview.error_span.0 }}<mark>{{ preview.error_span.1 }}</mark>{{ preview.error_span.2 }}</code></p>
+  {% endif %}
+  {% for message in preview.messages %}
+    <div class="alert alert-warning py-1 px-2 mb-1">{{ message }}</div>
+  {% endfor %}
+  {% if preview.shape %}
+    <p class="mb-0">Shape: <code>{{ preview.shape }}</code></p>
+  {% endif %}
+  {% if preview.proposals %}
+    <ul class="list-unstyled mb-0">
+      {% for proposal in preview.proposals %}
+        <li>
+          <code>{{ proposal.value }}</code>
+          {% if proposal.conflict %}<span class="badge text-bg-danger">Already taken</span>{% endif %}
+          {% for field, value in proposal.parts.items %}
+            <span class="text-secondary small">{{ field }}: <code>{{ value }}</code></span>
+          {% endfor %}
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endif %}

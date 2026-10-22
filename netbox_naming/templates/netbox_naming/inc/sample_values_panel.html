@@ -1,0 +1,11 @@
+{% extends "ui/panels/_base.html" %}
+
+{% block panel_content %}
+  <div class="card-body">
+    {% if allowed %}
+      {% include "netbox_naming/inc/template_preview.html" %}
+    {% else %}
+      <p class="text-secondary mb-0">Hidden: sample values need the <code>dcim.view_device</code> permission.</p>
+    {% endif %}
+  </div>
+{% endblock %}
