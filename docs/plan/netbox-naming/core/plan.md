@@ -262,3 +262,12 @@ Implementation items record any departure from this plan here.
   netboxcommunity/netbox:v4.7.3`), not at container start-up. Compose still bind-mounts the repo over
   `/opt/netbox-naming`, so the install resolves to the live tree. Reason: a build-time install matches the
   netbox-docker plugin recipe (F2) and avoids needing write access to the venv at runtime.
+- **B3 (FEAT-9), for B4:** the scope key in [Numbering and counter
+  storage](#numbering-and-counter-storage) joins `prefix`, width and `suffix` with `\x00`, but PostgreSQL
+  text columns reject NUL bytes (`DataError`), so `NamingCounter.scope_key` can't store that key. B4 must
+  pick another separator (e.g. `\x1f`, or hash the pattern part). The model is unaffected.
+- **B3 (FEAT-9):** `clean()` also rejects a convention with neither role nor device type (the
+  `CheckConstraint` only fires at save), and the cycle check treats every convention of the other
+  target field whose role/type slot could match the same devices as a candidate, since the engine picks
+  the nested convention from the device's own role and type. `pyproject.toml` ignores ruff `RUF012`
+  (class-level lists are the NetBox/Django idiom in `ChoiceSet` and migrations).
