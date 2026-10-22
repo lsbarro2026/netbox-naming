@@ -1,3 +1,7 @@
+from dcim.models import DeviceRole, DeviceType, Location
+from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.shortcuts import render
+from django.views.generic import View
 from extras.ui.panels import TagsPanel
 from netbox.object_actions import AddObject, BulkDelete, BulkExport, BulkImport
 from netbox.ui import attrs, layout
@@ -5,10 +9,11 @@ from netbox.ui.panels import CommentsPanel, ObjectAttributesPanel, TextCodePanel
 from netbox.views import generic
 from utilities.views import register_model_view
 
-from . import filtersets, forms, tables
+from . import filtersets, forms, generator, tables
 from .models import NamingConvention
 
 __all__ = (
+    "GenerateNamesView",
     "NamingConventionBulkDeleteView",
     "NamingConventionBulkImportView",
     "NamingConventionDeleteView",
@@ -78,3 +83,25 @@ class NamingConventionBulkDeleteView(generic.BulkDeleteView):
     queryset = NamingConvention.objects.select_related("role", "device_type")
     filterset = filtersets.NamingConventionFilterSet
     table = tables.NamingConventionTable
+
+
+class GenerateNamesView(PermissionRequiredMixin, View):
+    """Preview the next N names and asset tags. GET only: nothing is written or used up."""
+
+    http_method_names = ["get", "head", "options"]
+    permission_required = ("netbox_naming.view_namingconvention", "dcim.view_device")
+    template_name = "netbox_naming/generate_names.html"
+
+    def get(self, request):
+        form = forms.GenerateForm(request.GET or None)
+        # Ids the user can't see fail field validation, so they count as absent.
+        for field, model in (
+            ("role", DeviceRole),
+            ("device_type", DeviceType),
+            ("location", Location),
+        ):
+            form.fields[field].queryset = model.objects.restrict(request.user, "view")
+        generation = None
+        if form.is_valid():
+            generation = generator.generate(**form.cleaned_data)
+        return render(request, self.template_name, {"form": form, "generation": generation})

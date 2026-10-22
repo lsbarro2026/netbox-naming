@@ -251,3 +251,14 @@ Implementation items record any departure from this plan here.
 - **Ambiguous splits:** lazy `(.+?)` token groups can split a value such as `lon-core-ap01`
   differently from how it was rendered. In that case the series-match check shows "—" for next free,
   never a wrong number.
+
+### G2 (FEAT-15)
+
+- **`GenerateNamesView` uses `PermissionRequiredMixin`, not `LoginRequiredMixin`.** §Pages named
+  `LoginRequiredMixin`, but Decision 4 needs the two view permissions checked. The mixin sends an
+  anonymous user to login and gives a logged-in user without them a 403.
+- **The form's pickers need their own view permissions.** Role, device type and location resolve
+  through `.restrict(user, "view")` (Decision 4), so a user who lacks `dcim.view_devicerole`,
+  `view_devicetype` or `view_location` can't pick that object, and a posted id for it fails as absent.
+- **One shared cell template**, `templates/netbox_naming/inc/proposal_cell.html`, renders the Name and
+  Asset tag cells, since `GeneratedRow` has no list of proposals to loop over.

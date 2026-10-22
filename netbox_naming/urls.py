@@ -6,6 +6,7 @@ from . import views  # noqa: F401  (registers the model views)
 app_name = "netbox_naming"
 
 urlpatterns = [
+    path("generate/", views.GenerateNamesView.as_view(), name="generate"),
     path("namingconvention/", include(get_model_urls("netbox_naming", "namingconvention", detail=False))),
     path(
         "namingconvention/<int:pk>/",

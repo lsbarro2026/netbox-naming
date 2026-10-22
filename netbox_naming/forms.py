@@ -1,5 +1,6 @@
-from dcim.models import DeviceRole, DeviceType
+from dcim.models import DeviceRole, DeviceType, Location
 from django import forms
+from django.core.exceptions import ValidationError
 from netbox.forms import PrimaryModelFilterSetForm, PrimaryModelForm, PrimaryModelImportForm
 from utilities.forms.fields import (
     CSVChoiceField,
@@ -11,9 +12,11 @@ from utilities.forms.fields import (
 from utilities.forms.rendering import FieldSet
 
 from .choices import CounterScopeChoices, KindChoices, TargetFieldChoices
+from .generator import MAX_COUNT
 from .models import NamingConvention
 
 __all__ = (
+    "GenerateForm",
     "NamingConventionFilterForm",
     "NamingConventionForm",
     "NamingConventionImportForm",
@@ -113,3 +116,26 @@ class NamingConventionImportForm(PrimaryModelImportForm):
             "comments",
             "tags",
         )
+
+
+class GenerateForm(forms.Form):
+    role = DynamicModelChoiceField(queryset=DeviceRole.objects.all(), required=False)
+    device_type = DynamicModelChoiceField(queryset=DeviceType.objects.all(), required=False)
+    location = DynamicModelChoiceField(
+        queryset=Location.objects.all(),
+        required=False,
+        help_text="Gives the Site and Location tokens a value.",
+    )
+    tail = forms.CharField(required=False, help_text="For custom-tail conventions.")
+    count = forms.IntegerField(min_value=1, max_value=MAX_COUNT, initial=5)
+
+    fieldsets = (
+        FieldSet("role", "device_type", "location", name="Applies to"),
+        FieldSet("tail", "count", name="Options"),
+    )
+
+    def clean(self):
+        cleaned = super().clean()
+        if not cleaned.get("role") and not cleaned.get("device_type"):
+            raise ValidationError("Pick a role or a device type.")
+        return cleaned
