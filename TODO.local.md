@@ -68,7 +68,7 @@
 - **Source:** /todo-expanded, 2026-10-22.
 - **Route:** judgment
 
-### FEAT-6 — [BLOCKED: FEAT-4] [BLOCKED: FEAT-5] [BLOCKED: FEAT-2] netbox-naming: Acceptance
+### FEAT-6 — [BLOCKED: FEAT-10] [BLOCKED: FEAT-4] [BLOCKED: FEAT-5] [BLOCKED: FEAT-2] netbox-naming: Acceptance
 - **What:** Check `netbox-naming` end to end against the original request in `docs/plan/netbox-naming/overview.md` ("Request"), once every segment has landed. Turn each clause of the request into an observable check. At minimum: the plugin has its own page in NetBox; static, auto-numbered and custom-tail conventions can be created; an access-point-role convention `{room}-{asset_tag}` with an asset-tag convention `ap##` (globally scoped) renders correctly, with `{room}` taken from the device's Location; the existing asset tags list is readable; generating the next 5 APs shows 5 correct names and uses up no numbers. Run the test suite, then exercise the feature in a running NetBox. Write the results to `docs/plan/netbox-naming/acceptance.md`: each check, pass/fail, and the evidence. File every gap as its own bug through `/plan-todo`'s spin-off protocol (`.claude/skills/plan-todo/todo-planning-reference.md`, "Spinning off work"), not fixed inline.
 - **Why:** each segment was verified against its own plan; this checks that together they deliver what was asked.
 - **Request:** "Hello, I would like you to build a netbox plugin for naming conventions".
@@ -80,4 +80,48 @@
 - **Open questions:** none.
 - **Plan:** full.
 - **Source:** /todo-expanded, 2026-10-22.
+- **Route:** judgment
+
+### FEAT-7 — [BLOCKED: FEAT-2] core: Scaffold plugin package and dev environment
+- **What:** Implement breakdown B1 of `docs/plan/netbox-naming/core/plan.md`: `pyproject.toml`, `netbox_naming/__init__.py` (`NetBoxNamingConfig`, `base_url = "naming"`, `min_version = "4.7.3"`, `max_version = "4.7.99"`), empty `netbox_naming/migrations/` and `netbox_naming/tests/` packages, the `dev/` Docker Compose environment (PostgreSQL, Redis, `netboxcommunity/netbox` for v4.7.3, repo bind-mounted and `pip install -e`'d, `PLUGINS = ["netbox_naming"]`, `DEVELOPER = True`) with `dev/README.md`, and `COMPATIBILITY.md`.
+- **Binding plan:** plan.md is binding. Record any departure under its Deviations section. The plan docs stay in place; never delete or archive them.
+- **Why:** every later core item needs an installable plugin and a real NetBox + PostgreSQL to test against.
+- **Files:** `pyproject.toml`, `netbox_naming/__init__.py`, `netbox_naming/migrations/__init__.py`, `netbox_naming/tests/__init__.py`, `netbox_naming/tests/test_plugin.py`, `dev/`, `COMPATIBILITY.md`.
+- **Docs:** docs/plan/netbox-naming/core/plan.md#b1-scaffold-and-dev-environment
+- **Acceptance:** `docker compose up` in `dev/` serves NetBox 4.7.3 with the plugin installed; `manage.py check` is clean; a smoke test asserting the plugin is loaded passes via `manage.py test netbox_naming`.
+- **Out of scope:** models, engine, UI files.
+- **Plan:** full.
+- **Route:** standard
+
+### FEAT-8 — [BLOCKED: FEAT-7] core: Template grammar and token registry
+- **What:** Implement breakdown B2 of `docs/plan/netbox-naming/core/plan.md`: the whitelist template parser (literals, `{token}`, one `#`-run of width 1–9, `{tail}` last, no escapes), the token registry from the plan's table, and the `NamingError` exception hierarchy.
+- **Binding plan:** plan.md is binding. Record any departure under its Deviations section. The plan docs stay in place; never delete or archive them.
+- **Why:** the model's `clean()` (B3) and the engine (B4) both parse templates; rendering must never evaluate user input (research F6).
+- **Files:** `netbox_naming/templating.py`, `netbox_naming/exceptions.py`, `netbox_naming/tests/test_templating.py`.
+- **Docs:** docs/plan/netbox-naming/core/plan.md#b2-template-grammar-and-token-registry
+- **Acceptance:** parser/registry `SimpleTestCase` tests pass, including every rejection rule and the F6 injection strings; no `str.format`, `format_map`, `string.Template` or Jinja2 in the module.
+- **Out of scope:** counters, preview/allocate, models.
+- **Plan:** full.
+- **Route:** standard
+
+### FEAT-9 — [BLOCKED: FEAT-8] core: NamingConvention and NamingCounter models and migration
+- **What:** Implement breakdown B3 of `docs/plan/netbox-naming/core/plan.md`: `choices.py`, `NamingConvention(PrimaryModel)` with the plan's fields, constraints and `clean()` rules, `NamingCounter(models.Model)`, and `0001_initial` generated with `makemigrations` in the dev container.
+- **Binding plan:** plan.md is binding. Record any departure under its Deviations section. The plan docs stay in place; never delete or archive them.
+- **Why:** `management-ui` and `name-generator` build against this model (overview Contracts).
+- **Files:** `netbox_naming/choices.py`, `netbox_naming/models.py`, `netbox_naming/migrations/0001_initial.py`, `netbox_naming/tests/test_models.py`.
+- **Docs:** docs/plan/netbox-naming/core/plan.md#b3-models-and-migration
+- **Acceptance:** `makemigrations --check` reports no changes; model validation tests (each `clean()` rule, both constraints, PROTECT on role delete) pass.
+- **Out of scope:** engine, forms/views.
+- **Plan:** full.
+- **Route:** standard
+
+### FEAT-10 — [BLOCKED: FEAT-9] core: Naming engine preview, allocate, counters and nesting
+- **What:** Implement breakdown B4 of `docs/plan/netbox-naming/core/plan.md`: `NamingContext`, `Proposal`, `find_convention`, `preview` (no locks, no writes) and `allocate` (one transaction, `get_or_create` + `select_for_update` on each counter, dependency first), the hybrid scan-plus-counter numbering, collision skipping in each field's uniqueness domain, and nesting.
+- **Binding plan:** plan.md is binding. Record any departure under its Deviations section. The plan docs stay in place; never delete or archive them. This is the last core implementation item: set plan.md's Status to **Implemented**.
+- **Why:** `name-generator` (FEAT-5) consumes the engine API; it is the core of the request's 'generate the next 5 AP names'.
+- **Files:** `netbox_naming/engine.py`, `netbox_naming/tests/test_engine.py`, `netbox_naming/tests/test_allocation.py`, `docs/plan/netbox-naming/core/plan.md`.
+- **Docs:** docs/plan/netbox-naming/core/plan.md#b4-engine-preview-allocate-counters-nesting
+- **Acceptance:** engine `TestCase` tests and the `TransactionTestCase` concurrency test pass on PostgreSQL; the full `netbox_naming` suite is green; plan.md Status reads Implemented.
+- **Out of scope:** writing values onto Devices; UI; the next-N page.
+- **Plan:** full.
 - **Route:** judgment
