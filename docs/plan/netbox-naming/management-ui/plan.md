@@ -268,3 +268,7 @@ Implementation items record any departure from this plan here.
 - **Package data.** `pyproject.toml` now ships `templates/netbox_naming/*.html`, so a non-editable
   install keeps the detail-page template. NetBox's list test also needs the recorded baseline
   `tests/query_counts.json`.
+- **M2 (FEAT-12) added tests only.** The M1 API code needed no refinement. `tests/test_api.py` holds the
+  `APIViewTestCases`, the `get_serializer_for_model` check and the invalid-template, choice-field and
+  filter checks. It adds `api_list_objects` to `tests/query_counts.json`. NetBox's API tests create a
+  token, which needs `API_TOKEN_PEPPERS`, so `dev/docker-compose.yml` now sets `API_TOKEN_PEPPER_1`.
