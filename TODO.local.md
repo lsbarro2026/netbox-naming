@@ -123,7 +123,7 @@
 - **Route:** judgment
 - **Route:** judgment
 
-### FEAT-15 — [BLOCKED: FEAT-14] name-generator: Generate names page
+### FEAT-15 — [BLOCKED: FEAT-11] [BLOCKED: FEAT-14] name-generator: Generate names page
 - **What:** Implement breakdown G2 of `docs/plan/netbox-naming/name-generator/plan.md`: `GenerateForm` in `forms.py`, GET-only `GenerateNamesView` at `generate/` (POST returns 405), the Generator menu group with its Generate item, `templates/netbox_naming/generate_names.html`, and the generate cases in `tests/test_generator_views.py`. Edits to the shared `forms.py`, `views.py`, `urls.py` and `navigation.py` are additive only.
 - **Binding plan:** plan.md is binding. Record any departure under its Deviations section. The plan docs stay in place; never delete or archive them.
 - **Why:** "If I wanted to see what the next 5 APs would be called, I can generate their names."
