@@ -252,4 +252,19 @@ core's engine (FEAT-10).
 
 ## Deviations
 
-None yet. Implementation items record any departure from this plan here.
+Implementation items record any departure from this plan here.
+
+- **M1 (FEAT-11) pulled the API code forward from M2.** Any delete in the UI enqueues an event, which
+  serializes the object through `get_serializer_for_model` and reverses the serializer's `url`. Without
+  `api/serializers.py`, `api/views.py` and `api/urls.py` (the full, small API), delete and bulk delete
+  fail with a `ModuleNotFoundError`, and M2 can't land first because its viewset needs M1's filterset.
+  M1 therefore ships those three files plus `api/__init__.py`; M2 is left with `tests/test_api.py`
+  (the `APIViewTestCases`, invalid-template and `get_serializer_for_model` checks) and any refinements.
+- **Role filters include descendants.** `role_id` / `role` use `TreeNodeMultipleChoiceFilter`
+  (`lookup_expr="in"`), as dcim's device filterset does, because `DeviceRole` is a tree and NetBox's
+  filterset test mixin requires it. Device type filters are as planned.
+- **No per-option descriptions on `kind` / `target_field` / `counter_scope`.** The form carries
+  help text for each field instead; per-option descriptions would need changes to core's `choices.py`.
+- **Package data.** `pyproject.toml` now ships `templates/netbox_naming/*.html`, so a non-editable
+  install keeps the detail-page template. NetBox's list test also needs the recorded baseline
+  `tests/query_counts.json`.

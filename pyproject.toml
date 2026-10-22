@@ -13,7 +13,7 @@ dependencies = []
 include = ["netbox_naming*"]
 
 [tool.setuptools.package-data]
-netbox_naming = ["migrations/*.py"]
+netbox_naming = ["migrations/*.py", "templates/netbox_naming/*.html"]
 
 [tool.ruff]
 line-length = 100

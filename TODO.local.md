@@ -26,19 +26,7 @@
 - **Out of scope:** writing values onto Devices; UI; the next-N page.
 - **Plan:** full.
 - **Route:** judgment
-
-### FEAT-11 — management-ui: Naming convention CRUD pages and menu
-- **What:** Implement breakdown M1 of `docs/plan/netbox-naming/management-ui/plan.md`: filterset, model/filter/import forms (plain template input, no preview fieldset yet), table, generic list/detail/edit/delete/bulk-import/bulk-delete views with the declared list `actions`, `SimpleLayout` detail page without the sample panel, `urls.py`, the "Naming" `PluginMenu`, and `search.py`.
-- **Binding plan:** plan.md is binding. Record any departure under its Deviations section. The plan docs stay in place; never delete or archive them.
-- **Why:** this is the plugin's own page where users store and manage naming conventions (overview Request).
-- **Files:** `netbox_naming/filtersets.py`, `netbox_naming/forms.py`, `netbox_naming/tables.py`, `netbox_naming/views.py`, `netbox_naming/urls.py`, `netbox_naming/navigation.py`, `netbox_naming/search.py`, `netbox_naming/templates/netbox_naming/`, `netbox_naming/tests/test_views.py`, `netbox_naming/tests/test_filtersets.py`.
-- **Docs:** docs/plan/netbox-naming/management-ui/plan.md#m1-crud-pages-and-menu
-- **Acceptance:** CRUD view, filterset and navigation tests pass; the "Naming" menu lists Naming Conventions in the dev NetBox; full suite green.
-- **Out of scope:** REST API (M2), live preview and sample panel (M3), model/engine changes (`core`), generator pages (FEAT-5).
-- **Plan:** full.
-- **Route:** standard
-
-### FEAT-12 — [BLOCKED: FEAT-11] management-ui: Naming convention REST API
+### FEAT-12 — management-ui: Naming convention REST API
 - **What:** Implement breakdown M2 of `docs/plan/netbox-naming/management-ui/plan.md`: `NamingConventionSerializer`, `NamingConventionViewSet` with the filterset, and the `NetBoxRouter` in `api/urls.py`, so the API, event rules and webhooks work.
 - **Binding plan:** plan.md is binding. Record any departure under its Deviations section. The plan docs stay in place; never delete or archive them.
 - **Why:** event rules serialize objects via `get_serializer_for_model()` and fail without a plugin serializer (research F9).
@@ -72,7 +60,7 @@
 - **Route:** judgment
 - **Route:** judgment
 
-### FEAT-15 — [BLOCKED: FEAT-11] [BLOCKED: FEAT-14] name-generator: Generate names page
+### FEAT-15 — [BLOCKED: FEAT-14] name-generator: Generate names page
 - **What:** Implement breakdown G2 of `docs/plan/netbox-naming/name-generator/plan.md`: `GenerateForm` in `forms.py`, GET-only `GenerateNamesView` at `generate/` (POST returns 405), the Generator menu group with its Generate item, `templates/netbox_naming/generate_names.html`, and the generate cases in `tests/test_generator_views.py`. Edits to the shared `forms.py`, `views.py`, `urls.py` and `navigation.py` are additive only.
 - **Binding plan:** plan.md is binding. Record any departure under its Deviations section. The plan docs stay in place; never delete or archive them.
 - **Why:** "If I wanted to see what the next 5 APs would be called, I can generate their names."
