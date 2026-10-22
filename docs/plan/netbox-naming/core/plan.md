@@ -5,8 +5,7 @@ and contracts in [`../overview.md`](../overview.md).
 
 ## Status
 
-**Approved** (2026-10-22). Draft → Approved → Implemented. The last implementation item (B4) sets
-Implemented.
+**Implemented** (2026-10-22, B4 / FEAT-10). Draft → Approved → Implemented.
 
 ## Decision
 
@@ -271,3 +270,18 @@ Implementation items record any departure from this plan here.
   target field whose role/type slot could match the same devices as a candidate, since the engine picks
   the nested convention from the device's own role and type. `pyproject.toml` ignores ruff `RUF012`
   (class-level lists are the NetBox/Django idiom in `ChoiceSet` and migrations).
+- **B4 (FEAT-10):** the scope key separates `prefix`, width and `suffix` with `\x1f`, resolving the
+  B3 note above.
+- **B4 (FEAT-10):** a `site`- or `location`-scoped counter with no site or location in the context
+  raises `MissingToken("site")` / `MissingToken("location")`, so callers handle it like any unfilled
+  token instead of the engine silently scanning unscoped.
+- **B4 (FEAT-10):** a static or tail value repeated within one batch is a conflict (flagged in
+  `preview`, `Conflict` in `allocate`). A proposal is also `conflict=True` when one of its nested
+  values is, since the row can't be used as a whole.
+- **B4 (FEAT-10):** the engine decides numbered vs fixed from the parsed parts, not `kind`, so
+  `preview` works on an unsaved convention that hasn't been cleaned.
+- **B4 (FEAT-10):** numbering keeps one sequence (and counter) per distinct rendered pattern in a
+  batch, so a numbered template whose prefix varies with a nested value (`{asset_tag}-##`) numbers
+  each prefix on its own. Sequences lock in sorted scope-key order, after any dependency.
+- **B4 (FEAT-10):** an unsaved template that would nest twice, or nest its own target field, raises
+  `TemplateError`; saved conventions can't, because `clean()` rejects cycles.
