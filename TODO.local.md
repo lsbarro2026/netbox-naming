@@ -3,24 +3,7 @@
 ## Admin
 
 ## Open
-### FEAT-5 — name-generator: Plan asset-tag list and next-N name preview
-- **What:** Plan segment `name-generator` of `netbox-naming`. This segment has no research item. Open plan.md with a short current-state survey of `docs/plan/netbox-naming/core/plan.md` (the engine's preview/allocate API and the counter storage) and whatever has landed under `netbox_naming/` (`engine.py`, `models.py`, and `views.py`/`templates/` from `management-ui` if present). Give the Extend / Refactor-then-extend / Replace verdict yourself, with a reason. Write `docs/plan/netbox-naming/name-generator/plan.md` with: Status (Draft → Approved → Implemented) · Decision · Design · Contracts (pointing at overview.md, not restating it) · Test strategy · Implementation breakdown (one entry per implementation item: scope, files, route, acceptance) · Deviations (empty). The design covers two views. (a) An intuitive list of existing asset tags (and names) per convention, showing which numbers are taken and the next free one. (b) A form where the user picks a device role or device type (plus a Location for `{room}`-style tokens) and a count N, and sees the next N names and asset tags. Generating must be a read-only preview through the engine's non-allocating API: it never uses up numbers. Planned files: `netbox_naming/generator.py`, a view in `netbox_naming/views.py`, a template under `netbox_naming/templates/`. Note in the plan that `views.py`/`urls.py`/`navigation.py` are shared with `management-ui`, and keep edits there additive. Your `/plan-todo` plan-mode plan is an outline of plan.md with the verdict up front, so my approval of it is the sign-off on extend vs replace; set Status to Approved when I approve.
-- **ADR:** a Replace verdict, or any architecture decision, also gets an ADR, but only if `python3 .claude/todo-lock.py seq list` shows an `adr` sequence: reserve it with `seq reserve adr --claim FEAT-5` (`.claude/skills/plan-todo/todo-planning-reference.md`, "Reserving a sequence number"). Without one, the decision lives in plan.md's Decision section.
-- **Filing the implementation items** (from this item's worktree, after plan.md is written): one `python3 .claude/todo-lock.py add-bulk --chain --commit --file <path>` call, the JSON written with the Write tool. The first item is `"blocked_by"` FEAT-5 (legal while it's in progress; the gate clears when it lands). Route each item honestly with `/todo`'s table, and give each `- **Docs:** docs/plan/netbox-naming/name-generator/plan.md#<its breakdown section>`. Each implementation body says: plan.md is binding; any departure is recorded under its Deviations section; the last item sets Status to Implemented; the plan docs stay in place and are never deleted or archived.
-- **Re-gate Acceptance:** after filing them, run `python3 .claude/todo-lock.py block FEAT-6 --blocked-by <last implementation id> --commit`, before `/finish`. `block` refuses a claimed item, but FEAT-6 can't be claimed: it's gated on this Plan item until this lands.
-- **Why:** previewing upcoming names ("the next 5 APs") is the user-facing payoff of the conventions, and it must not use up numbers it only shows.
-- **Request:** "The user should be able to see an intuitive list of the existing asset tags, and generate a list of the next x devices of a device type. So, if I wanted to see what the next 5 ap's would be called, I can generate their names."
-- **Files:** `docs/plan/netbox-naming/name-generator/plan.md` (new).
-- **Docs:** `docs/plan/netbox-naming/overview.md`, `docs/plan/netbox-naming/core/plan.md`.
-- **Acceptance:** plan.md has every section above with Status Approved; `todo-lock.py summary` shows the implementation chain, its first item gated on FEAT-5; `todo-lock.py show FEAT-6` shows it blocked on the chain's last item.
-- **Re-segmentation stop:** if planning shows the segmentation is wrong (segments should merge or split, a new one is needed, or a contract in overview.md must change), write it up in plan.md and stop and surface it to the user before filing anything. Don't re-cut other segments.
-- **Out of scope:** writing the implementation itself; changing the engine or model (`core`); convention CRUD pages (`management-ui`); assigning names to real devices; other segments' docs and items.
-- **Open questions:** none.
-- **Plan:** full.
-- **Source:** /todo-expanded, 2026-10-22.
-- **Route:** judgment
-
-### FEAT-6 — [BLOCKED: FEAT-16] [BLOCKED: FEAT-13] [BLOCKED: FEAT-10] [BLOCKED: FEAT-5] netbox-naming: Acceptance
+### FEAT-6 — [BLOCKED: FEAT-16] [BLOCKED: FEAT-13] [BLOCKED: FEAT-10] netbox-naming: Acceptance
 - **What:** Check `netbox-naming` end to end against the original request in `docs/plan/netbox-naming/overview.md` ("Request"), once every segment has landed. Turn each clause of the request into an observable check. At minimum: the plugin has its own page in NetBox; static, auto-numbered and custom-tail conventions can be created; an access-point-role convention `{room}-{asset_tag}` with an asset-tag convention `ap##` (globally scoped) renders correctly, with `{room}` taken from the device's Location; the existing asset tags list is readable; generating the next 5 APs shows 5 correct names and uses up no numbers. Run the test suite, then exercise the feature in a running NetBox. Write the results to `docs/plan/netbox-naming/acceptance.md`: each check, pass/fail, and the evidence. File every gap as its own bug through `/plan-todo`'s spin-off protocol (`.claude/skills/plan-todo/todo-planning-reference.md`, "Spinning off work"), not fixed inline.
 - **Why:** each segment was verified against its own plan; this checks that together they deliver what was asked.
 - **Request:** "Hello, I would like you to build a netbox plugin for naming conventions".
@@ -111,7 +94,7 @@
 - **Plan:** full.
 - **Route:** judgment
 
-### FEAT-14 — [BLOCKED: FEAT-10] [BLOCKED: FEAT-5] name-generator: Generator service (inventory and next-N preview)
+### FEAT-14 — [BLOCKED: FEAT-10] name-generator: Generator service (inventory and next-N preview)
 - **What:** Implement breakdown G1 of `docs/plan/netbox-naming/name-generator/plan.md`: `netbox_naming/generator.py` with `series_pattern`, `collapse_ranges`, `inventory` (series per counter scope and captured token text, taken ranges, highest, honest next free via `engine.preview`) and `generate` (name and asset_tag pairing via `Proposal.parts` or a separate preview, count clamped to 1..50, errors as messages). Read-only: never import `allocate`.
 - **Binding plan:** plan.md is binding. Record any departure under its Deviations section. The plan docs stay in place; never delete or archive them.
 - **Why:** the generator pages (G2, G3) are thin views over this service; keeping it read-only is the segment's core invariant.
