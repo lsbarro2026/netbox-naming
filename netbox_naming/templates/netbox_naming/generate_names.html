@@ -1,0 +1,55 @@
+{% extends 'generic/_base.html' %}
+{% load form_helpers %}
+
+{% block title %}Generate names{% endblock %}
+
+{% block content %}
+  <p class="text-secondary">
+    Previews the next names and asset tags for a role and/or device type. Nothing is saved or used up,
+    so running it again shows the same values.
+  </p>
+
+  <form action="" method="get" class="mt-3">
+    {% render_form form %}
+    <div class="btn-list mt-3">
+      <button type="submit" class="btn btn-primary">Generate</button>
+    </div>
+  </form>
+
+  {% if generation %}
+    <div class="card mt-4">
+      <h2 class="card-header">Next {{ generation.rows|length }}</h2>
+      <div class="card-body">
+        {% for message in generation.messages %}
+          <div class="alert alert-warning">{{ message }}</div>
+        {% endfor %}
+        <p>
+          Name convention:
+          {% if generation.name_convention %}
+            <a href="{{ generation.name_convention.get_absolute_url }}">{{ generation.name_convention }}</a>
+          {% else %}—{% endif %}
+          · Asset tag convention:
+          {% if generation.asset_tag_convention %}
+            <a href="{{ generation.asset_tag_convention.get_absolute_url }}">{{ generation.asset_tag_convention }}</a>
+          {% else %}—{% endif %}
+        </p>
+      </div>
+      {% if generation.rows %}
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr><th>#</th><th>Name</th><th>Asset tag</th></tr>
+          </thead>
+          <tbody>
+            {% for row in generation.rows %}
+              <tr>
+                <td>{{ row.index }}</td>
+                {% include 'netbox_naming/inc/proposal_cell.html' with proposal=row.name %}
+                {% include 'netbox_naming/inc/proposal_cell.html' with proposal=row.asset_tag %}
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% endif %}
+    </div>
+  {% endif %}
+{% endblock %}
