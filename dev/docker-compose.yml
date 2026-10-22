@@ -1,0 +1,58 @@
+name: netbox-naming-dev
+
+x-netbox: &netbox
+  build:
+    context: ..
+    dockerfile: dev/Dockerfile
+  image: netbox-naming-dev:v4.7.3
+  depends_on:
+    - postgres
+    - redis
+  environment:
+    DB_HOST: postgres
+    DB_NAME: netbox
+    DB_USER: netbox
+    DB_PASSWORD: netbox
+    REDIS_HOST: redis
+    REDIS_DATABASE: "0"
+    REDIS_CACHE_HOST: redis
+    REDIS_CACHE_DATABASE: "1"
+    SECRET_KEY: dev-only-secret-key-dev-only-secret-key-dev-only-secret-key
+    ALLOWED_HOSTS: "*"
+    DEBUG: "false"
+    DEVELOPER: "true"
+    SKIP_SUPERUSER: "false"
+    SUPERUSER_NAME: admin
+    SUPERUSER_EMAIL: admin@example.com
+    SUPERUSER_PASSWORD: admin
+    SUPERUSER_API_TOKEN: 0123456789abcdef0123456789abcdef01234567
+  volumes:
+    - ..:/opt/netbox-naming
+    - ./configuration/plugins.py:/etc/netbox/config/plugins.py:ro
+
+services:
+  netbox:
+    <<: *netbox
+    ports:
+      - "8000:8080"
+
+  netbox-worker:
+    <<: *netbox
+    depends_on:
+      - netbox
+    command: /opt/netbox/venv/bin/python /opt/netbox/netbox/manage.py rqworker
+
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: netbox
+      POSTGRES_USER: netbox
+      POSTGRES_PASSWORD: netbox
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+
+volumes:
+  postgres-data:

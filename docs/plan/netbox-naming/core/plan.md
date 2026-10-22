@@ -256,4 +256,9 @@ Filed as a chain; B1 waits on FEAT-2.
 
 ## Deviations
 
-None yet. Implementation items record any departure from this plan here.
+Implementation items record any departure from this plan here.
+
+- **B1 (FEAT-7):** the editable install happens at image build (`dev/Dockerfile`, `FROM
+  netboxcommunity/netbox:v4.7.3`), not at container start-up. Compose still bind-mounts the repo over
+  `/opt/netbox-naming`, so the install resolves to the live tree. Reason: a build-time install matches the
+  netbox-docker plugin recipe (F2) and avoids needing write access to the venv at runtime.
