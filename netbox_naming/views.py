@@ -1,16 +1,20 @@
 from dcim.models import DeviceRole, DeviceType, Location
-from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.shortcuts import render
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.http import Http404
+from django.shortcuts import get_object_or_404, render
 from django.views.generic import View
 from extras.ui.panels import TagsPanel
 from netbox.object_actions import AddObject, BulkDelete, BulkExport, BulkImport
 from netbox.ui import attrs, layout
-from netbox.ui.panels import CommentsPanel, ObjectAttributesPanel, TextCodePanel
+from netbox.ui.panels import CommentsPanel, ObjectAttributesPanel, ObjectPanel, TextCodePanel
 from netbox.views import generic
 from utilities.views import register_model_view
 
 from . import filtersets, forms, generator, tables
+from .choices import CounterScopeChoices
+from .engine import NamingContext
 from .models import NamingConvention
+from .preview import preview_convention
 
 __all__ = (
     "GenerateNamesView",
@@ -20,7 +24,11 @@ __all__ = (
     "NamingConventionEditView",
     "NamingConventionListView",
     "NamingConventionView",
+    "SampleValuesPanel",
+    "TemplatePreviewView",
 )
+
+DEVICE_PERMISSION = "dcim.view_device"
 
 
 class NamingConventionPanel(ObjectAttributesPanel):
@@ -32,6 +40,24 @@ class NamingConventionPanel(ObjectAttributesPanel):
     counter_scope = attrs.ChoiceAttr("counter_scope")
     tail_max_length = attrs.NumericAttr("tail_max_length")
     description = attrs.TextAttr("description")
+
+
+class SampleValuesPanel(ObjectPanel):
+    """The saved convention's next values, with only its own role and device type as context."""
+
+    template_name = "netbox_naming/inc/sample_values_panel.html"
+    title = "Sample values"
+
+    def get_context(self, context):
+        ctx = super().get_context(context)
+        convention = ctx["object"]
+        ctx["allowed"] = ctx["request"].user.has_perm(DEVICE_PERMISSION)
+        if ctx["allowed"]:
+            ctx["preview"] = preview_convention(
+                convention,
+                NamingContext(role=convention.role, device_type=convention.device_type),
+            )
+        return ctx
 
 
 @register_model_view(NamingConvention, "list", path="", detail=False)
@@ -52,6 +78,7 @@ class NamingConventionView(generic.ObjectView):
             TextCodePanel("template"),
         ],
         right_panels=[
+            SampleValuesPanel(),
             TagsPanel(),
         ],
         bottom_panels=[
@@ -105,3 +132,53 @@ class GenerateNamesView(PermissionRequiredMixin, View):
         if form.is_valid():
             generation = generator.generate(**form.cleaned_data)
         return render(request, self.template_name, {"form": form, "generation": generation})
+
+
+class TemplatePreviewView(LoginRequiredMixin, View):
+    """Render the editor's preview partial. Read-only; the gate is plan Decision 4."""
+
+    http_method_names = ["post"]
+    template_name = "netbox_naming/inc/template_preview.html"
+
+    def post(self, request):
+        user, data = request.user, request.POST
+        if not user.has_perm(DEVICE_PERMISSION):
+            return self._denied(request, DEVICE_PERMISSION)
+        if pk := data.get("pk"):
+            if not pk.isdigit():
+                raise Http404
+            convention = get_object_or_404(NamingConvention.objects.restrict(user, "change"), pk=pk)
+        elif user.has_perm("netbox_naming.add_namingconvention"):
+            convention = NamingConvention()
+        else:
+            return self._denied(request, "netbox_naming.add_namingconvention")
+
+        # Ids the user can't see count as absent.
+        role = _visible(DeviceRole, user, data.get("role"))
+        device_type = _visible(DeviceType, user, data.get("device_type"))
+        location = _visible(Location, user, data.get("preview_location"))
+        tail_max_length = data.get("tail_max_length", "")
+        convention.kind = data.get("kind", "")
+        convention.target_field = data.get("target_field", "")
+        convention.template = data.get("template", "")
+        convention.counter_scope = data.get("counter_scope") or CounterScopeChoices.GLOBAL
+        convention.tail_max_length = int(tail_max_length) if tail_max_length.isdigit() else None
+        convention.role, convention.device_type = role, device_type
+
+        context = NamingContext(
+            role=role,
+            device_type=device_type,
+            site=location.site if location is not None else None,
+            location=location,
+        )
+        preview = preview_convention(convention, context, tail=data.get("preview_tail"))
+        return render(request, self.template_name, {"preview": preview})
+
+    def _denied(self, request, permission):
+        return render(request, self.template_name, {"missing_permission": permission}, status=403)
+
+
+def _visible(model, user, pk):
+    if not pk or not pk.isdigit():
+        return None
+    return model.objects.restrict(user, "view").filter(pk=pk).first()
