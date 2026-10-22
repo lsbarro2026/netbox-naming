@@ -229,4 +229,25 @@ management-ui's M1 (FEAT-11), which creates the shared view, URL, form and navig
 
 ## Deviations
 
-None yet. Implementation items record any departure from this plan here.
+Implementation items record any departure from this plan here.
+
+### G1 (FEAT-14)
+
+- **Next free clears only the convention's own target field.** Decision 3 cleared both `name` and
+  `asset_tag` on the representative's context. That makes a numbered convention that nests the
+  other field (`{asset_tag}-##`) render a freshly nested value, so next free almost always shows
+  "—". Keeping the device's own value for the other field gives the number `allocate` would hand
+  that device. The series-match check still turns any mismatch into "—".
+- **The asset_tag column always comes from a separate `preview`.** Decision 2 took the tags of a
+  name that nests `{asset_tag}` from `Proposal.parts`. The separate preview returns the same values
+  by construction (same convention, context, count and tail; a test asserts the equality). Unlike
+  `parts`, it also keeps each tag's own number and conflict flag, and it still fills the column when
+  the name preview fails.
+- **Static and tail conventions get one series**, labelled with the template, instead of one per
+  token capture. They have no numbers or counter, so per-capture series would only split the value
+  list.
+- **Devices without a location under `counter_scope=location`** form their own series with no
+  scope and no next free, since the engine can't number them.
+- **Ambiguous splits:** lazy `(.+?)` token groups can split a value such as `lon-core-ap01`
+  differently from how it was rendered. In that case the series-match check shows "—" for next free,
+  never a wrong number.
