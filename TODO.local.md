@@ -37,7 +37,7 @@
 - **Source:** /todo-expanded, 2026-10-22.
 - **Route:** judgment
 
-### FEAT-6 — [BLOCKED: FEAT-10] [BLOCKED: FEAT-4] [BLOCKED: FEAT-5] netbox-naming: Acceptance
+### FEAT-6 — [BLOCKED: FEAT-13] [BLOCKED: FEAT-10] [BLOCKED: FEAT-4] [BLOCKED: FEAT-5] netbox-naming: Acceptance
 - **What:** Check `netbox-naming` end to end against the original request in `docs/plan/netbox-naming/overview.md` ("Request"), once every segment has landed. Turn each clause of the request into an observable check. At minimum: the plugin has its own page in NetBox; static, auto-numbered and custom-tail conventions can be created; an access-point-role convention `{room}-{asset_tag}` with an asset-tag convention `ap##` (globally scoped) renders correctly, with `{room}` taken from the device's Location; the existing asset tags list is readable; generating the next 5 APs shows 5 correct names and uses up no numbers. Run the test suite, then exercise the feature in a running NetBox. Write the results to `docs/plan/netbox-naming/acceptance.md`: each check, pass/fail, and the evidence. File every gap as its own bug through `/plan-todo`'s spin-off protocol (`.claude/skills/plan-todo/todo-planning-reference.md`, "Spinning off work"), not fixed inline.
 - **Why:** each segment was verified against its own plan; this checks that together they deliver what was asked.
 - **Request:** "Hello, I would like you to build a netbox plugin for naming conventions".
@@ -92,5 +92,38 @@
 - **Docs:** docs/plan/netbox-naming/core/plan.md#b4-engine-preview-allocate-counters-nesting
 - **Acceptance:** engine `TestCase` tests and the `TransactionTestCase` concurrency test pass on PostgreSQL; the full `netbox_naming` suite is green; plan.md Status reads Implemented.
 - **Out of scope:** writing values onto Devices; UI; the next-N page.
+- **Plan:** full.
+- **Route:** judgment
+
+### FEAT-11 — [BLOCKED: FEAT-9] [BLOCKED: FEAT-4] management-ui: Naming convention CRUD pages and menu
+- **What:** Implement breakdown M1 of `docs/plan/netbox-naming/management-ui/plan.md`: filterset, model/filter/import forms (plain template input, no preview fieldset yet), table, generic list/detail/edit/delete/bulk-import/bulk-delete views with the declared list `actions`, `SimpleLayout` detail page without the sample panel, `urls.py`, the "Naming" `PluginMenu`, and `search.py`.
+- **Binding plan:** plan.md is binding. Record any departure under its Deviations section. The plan docs stay in place; never delete or archive them.
+- **Why:** this is the plugin's own page where users store and manage naming conventions (overview Request).
+- **Files:** `netbox_naming/filtersets.py`, `netbox_naming/forms.py`, `netbox_naming/tables.py`, `netbox_naming/views.py`, `netbox_naming/urls.py`, `netbox_naming/navigation.py`, `netbox_naming/search.py`, `netbox_naming/templates/netbox_naming/`, `netbox_naming/tests/test_views.py`, `netbox_naming/tests/test_filtersets.py`.
+- **Docs:** docs/plan/netbox-naming/management-ui/plan.md#m1-crud-pages-and-menu
+- **Acceptance:** CRUD view, filterset and navigation tests pass; the "Naming" menu lists Naming Conventions in the dev NetBox; full suite green.
+- **Out of scope:** REST API (M2), live preview and sample panel (M3), model/engine changes (`core`), generator pages (FEAT-5).
+- **Plan:** full.
+- **Route:** standard
+
+### FEAT-12 — [BLOCKED: FEAT-11] management-ui: Naming convention REST API
+- **What:** Implement breakdown M2 of `docs/plan/netbox-naming/management-ui/plan.md`: `NamingConventionSerializer`, `NamingConventionViewSet` with the filterset, and the `NetBoxRouter` in `api/urls.py`, so the API, event rules and webhooks work.
+- **Binding plan:** plan.md is binding. Record any departure under its Deviations section. The plan docs stay in place; never delete or archive them.
+- **Why:** event rules serialize objects via `get_serializer_for_model()` and fail without a plugin serializer (research F9).
+- **Files:** `netbox_naming/api/__init__.py`, `netbox_naming/api/serializers.py`, `netbox_naming/api/views.py`, `netbox_naming/api/urls.py`, `netbox_naming/tests/test_api.py`.
+- **Docs:** docs/plan/netbox-naming/management-ui/plan.md#m2-rest-api
+- **Acceptance:** API tests pass; `get_serializer_for_model(NamingConvention)` resolves; full suite green.
+- **Out of scope:** GraphQL, UI changes, model/engine changes.
+- **Plan:** full.
+- **Route:** routine
+
+### FEAT-13 — [BLOCKED: FEAT-12] [BLOCKED: FEAT-10] management-ui: Live template editor and sample values
+- **What:** Implement breakdown M3 of `docs/plan/netbox-naming/management-ui/plan.md`: `preview.py` (parse → `clean()` → `engine.preview` with shape-mode fallback), the `TemplateInput` htmx widget, preview-only form fields, the hand-secured `TemplatePreviewView` (permission gate per plan Decision 4), the detail page's `SampleValuesPanel`, and their templates. Then set plan.md's Status to Implemented.
+- **Binding plan:** plan.md is binding. Record any departure (including any gap in core's API from plan §Consumed core surface) under its Deviations section. This is the last item: set Status to Implemented. The plan docs stay in place; never delete or archive them.
+- **Why:** the request asks for an intuitive editor: unknown tokens flagged inline and a live sample render.
+- **Files:** `netbox_naming/preview.py`, `netbox_naming/widgets.py`, `netbox_naming/forms.py`, `netbox_naming/views.py`, `netbox_naming/urls.py`, `netbox_naming/templates/netbox_naming/widgets/template_input.html`, `netbox_naming/templates/netbox_naming/inc/template_preview.html`, `netbox_naming/tests/test_preview.py`, `docs/plan/netbox-naming/management-ui/plan.md`.
+- **Docs:** docs/plan/netbox-naming/management-ui/plan.md#m3-live-template-editor-and-sample-values
+- **Acceptance:** preview tests pass (permission matrix, hidden ids absent, shape fallback, conflicts, count cap, no counter writes); browser check in the dev NetBox done; full suite green; plan Status reads Implemented.
+- **Out of scope:** calling `allocate`; generator pages (FEAT-5); model/engine changes.
 - **Plan:** full.
 - **Route:** judgment
