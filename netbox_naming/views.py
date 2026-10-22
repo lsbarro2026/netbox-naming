@@ -1,4 +1,4 @@
-from dcim.models import DeviceRole, DeviceType, Location
+from dcim.models import Device, DeviceRole, DeviceType, Location
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.http import Http404
 from django.shortcuts import get_object_or_404, render
@@ -8,7 +8,8 @@ from netbox.object_actions import AddObject, BulkDelete, BulkExport, BulkImport
 from netbox.ui import attrs, layout
 from netbox.ui.panels import CommentsPanel, ObjectAttributesPanel, ObjectPanel, TextCodePanel
 from netbox.views import generic
-from utilities.views import register_model_view
+from utilities.paginator import EnhancedPaginator, get_paginate_count
+from utilities.views import ViewTab, register_model_view
 
 from . import filtersets, forms, generator, tables
 from .choices import CounterScopeChoices
@@ -18,10 +19,12 @@ from .preview import preview_convention
 
 __all__ = (
     "GenerateNamesView",
+    "NameInventoryListView",
     "NamingConventionBulkDeleteView",
     "NamingConventionBulkImportView",
     "NamingConventionDeleteView",
     "NamingConventionEditView",
+    "NamingConventionInventoryView",
     "NamingConventionListView",
     "NamingConventionView",
     "SampleValuesPanel",
@@ -132,6 +135,48 @@ class GenerateNamesView(PermissionRequiredMixin, View):
         if form.is_valid():
             generation = generator.generate(**form.cleaned_data)
         return render(request, self.template_name, {"form": form, "generation": generation})
+
+
+def _page(request, items):
+    """One page of `items`, sized by NetBox's per-page setting."""
+    paginator = EnhancedPaginator(items, get_paginate_count(request))
+    return paginator, paginator.get_page(request.GET.get("page"))
+
+
+class NameInventoryListView(PermissionRequiredMixin, View):
+    """Values in use, per convention. Read-only; the inventory runs only for the visible page."""
+
+    http_method_names = ["get", "head", "options"]
+    permission_required = ("netbox_naming.view_namingconvention", "dcim.view_device")
+    template_name = "netbox_naming/name_inventory.html"
+
+    def get(self, request):
+        conventions = NamingConvention.objects.restrict(request.user, "view").order_by("name")
+        paginator, page = _page(request, conventions)
+        devices = Device.objects.restrict(request.user, "view")
+        rows = []
+        for convention in page:
+            inventory = generator.inventory(convention, devices)
+            in_use = sum(len(series.taken) for series in inventory.series)
+            rows.append((inventory, in_use))
+        return render(
+            request, self.template_name, {"rows": rows, "paginator": paginator, "page": page}
+        )
+
+
+@register_model_view(NamingConvention, "inventory", path="inventory")
+class NamingConventionInventoryView(generic.ObjectView):
+    queryset = NamingConvention.objects.all()
+    template_name = "netbox_naming/namingconvention_inventory.html"
+    additional_permissions = ["dcim.view_device"]
+    tab = ViewTab(label="Inventory", permission="dcim.view_device")
+
+    def get_extra_context(self, request, instance):
+        devices = Device.objects.restrict(request.user, "view")
+        inventory = generator.inventory(instance, devices)
+        taken = [value for series in inventory.series for value in series.taken]
+        paginator, page = _page(request, taken)
+        return {"inventory": inventory, "paginator": paginator, "page": page}
 
 
 class TemplatePreviewView(LoginRequiredMixin, View):

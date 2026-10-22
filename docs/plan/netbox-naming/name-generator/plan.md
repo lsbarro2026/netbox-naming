@@ -7,8 +7,8 @@ FEAT-5, 2026-10-22. This segment has no research item. It builds on the segment 
 
 ## Status
 
-**Approved** (2026-10-22). Draft → Approved → Implemented. The last implementation item (G3) sets
-Implemented.
+**Implemented** (2026-10-22). Draft → Approved → Implemented. G1 – G3 (FEAT-14 … FEAT-16) have
+landed.
 
 ## Current state
 
@@ -262,3 +262,16 @@ Implementation items record any departure from this plan here.
   `view_devicetype` or `view_location` can't pick that object, and a posted id for it fails as absent.
 - **One shared cell template**, `templates/netbox_naming/inc/proposal_cell.html`, renders the Name and
   Asset tag cells, since `GeneratedRow` has no list of proposals to loop over.
+
+### G3 (FEAT-16)
+
+- **`NameInventoryListView` uses `PermissionRequiredMixin`**, as G2 does, so a logged-in user without
+  either permission gets a 403 and an anonymous user goes to login.
+- **The tab view enforces `dcim.view_device`, not just the tab's visibility.** `ViewTab(permission=…)`
+  only hides the tab, so `NamingConventionInventoryView` also sets
+  `additional_permissions = ["dcim.view_device"]`. Otherwise the URL would be open to a user with only
+  the convention permission, and next free comes from the engine's unrestricted scan.
+- **One shared snippet**, `templates/netbox_naming/inc/series_next.html`, renders next free (the value
+  or "—") on both pages.
+- **Static and tail conventions show "—"** for highest and next free on the list (their one series has
+  neither), and the list's "In use" counts every value across series.

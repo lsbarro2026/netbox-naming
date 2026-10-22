@@ -7,6 +7,7 @@ app_name = "netbox_naming"
 
 urlpatterns = [
     path("generate/", views.GenerateNamesView.as_view(), name="generate"),
+    path("inventory/", views.NameInventoryListView.as_view(), name="inventory"),
     path("namingconvention/", include(get_model_urls("netbox_naming", "namingconvention", detail=False))),
     path(
         "namingconvention/<int:pk>/",

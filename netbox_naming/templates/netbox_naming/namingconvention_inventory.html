@@ -1,0 +1,53 @@
+{% extends 'netbox_naming/namingconvention.html' %}
+
+{% block content %}
+  <p class="text-secondary">
+    Values already in use for <code>{{ object.template }}</code>. Gaps are skipped, not reused.
+  </p>
+
+  {% for series in inventory.series %}
+    <div class="card mb-3">
+      <h2 class="card-header">
+        <code>{{ series.label }}</code>
+        {% if series.scope %}<span class="text-secondary ms-2">{{ series.scope }}</span>{% endif %}
+      </h2>
+      <div class="card-body">
+        {% if series.ranges %}
+          <p>
+            Taken:
+            {% for start, end in series.ranges %}{% if start == end %}{{ start }}{% else %}{{ start }}–{{ end }}{% endif %}{% if not forloop.last %}, {% endif %}{% endfor %}
+          </p>
+          <p>Highest: <code>{{ series.highest.value }}</code> · Next free: {% include 'netbox_naming/inc/series_next.html' %}</p>
+        {% else %}
+          <p class="mb-0">{{ series.taken|length }} value{{ series.taken|length|pluralize }} in use.</p>
+        {% endif %}
+      </div>
+    </div>
+  {% empty %}
+    <div class="alert alert-info">No values in use.</div>
+  {% endfor %}
+
+  {% if page.object_list %}
+    <div class="card">
+      <h2 class="card-header">Devices</h2>
+      <table class="table table-hover mb-0">
+        <thead>
+          <tr><th>Device</th><th>Value</th><th>Number</th><th>Role</th><th>Type</th><th>Location</th></tr>
+        </thead>
+        <tbody>
+          {% for taken in page.object_list %}
+            <tr>
+              <td><a href="{{ taken.device.get_absolute_url }}">{{ taken.device }}</a></td>
+              <td><code>{{ taken.value }}</code></td>
+              <td>{{ taken.number|default_if_none:"—" }}</td>
+              <td>{{ taken.device.role }}</td>
+              <td>{{ taken.device.device_type }}</td>
+              <td>{{ taken.device.location|default:"—" }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% include 'inc/paginator.html' with placement='bottom' %}
+    </div>
+  {% endif %}
+{% endblock %}

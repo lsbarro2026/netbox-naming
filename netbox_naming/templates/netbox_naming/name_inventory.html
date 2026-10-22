@@ -1,0 +1,48 @@
+{% extends 'generic/_base.html' %}
+
+{% block title %}Name inventory{% endblock %}
+
+{% block content %}
+  <p class="text-secondary">
+    The values each convention has already handed out, and the next free one. Gaps are skipped, not reused.
+  </p>
+
+  <div class="card mt-3">
+    <table class="table table-hover mb-0">
+      <thead>
+        <tr>
+          <th>Convention</th><th>Template</th><th>Field</th><th>Counter scope</th>
+          <th>In use</th><th>Highest</th><th>Next free</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for inventory, in_use in rows %}
+          {% with convention=inventory.convention %}
+            <tr>
+              <td><a href="{{ convention.get_absolute_url }}">{{ convention }}</a></td>
+              <td><code>{{ convention.template }}</code></td>
+              <td>{{ convention.get_target_field_display }}</td>
+              <td>{{ convention.get_counter_scope_display }}</td>
+              <td>{{ in_use }}</td>
+              {% if inventory.series|length == 1 %}
+                {% with series=inventory.series.0 %}
+                  <td>{% if series.highest %}<code>{{ series.highest.value }}</code>{% else %}—{% endif %}</td>
+                  <td>{% include 'netbox_naming/inc/series_next.html' %}</td>
+                {% endwith %}
+              {% elif inventory.series %}
+                <td colspan="2">
+                  <a href="{% url 'plugins:netbox_naming:namingconvention_inventory' pk=convention.pk %}">per site/location →</a>
+                </td>
+              {% else %}
+                <td>—</td><td>—</td>
+              {% endif %}
+            </tr>
+          {% endwith %}
+        {% empty %}
+          <tr><td colspan="7" class="text-secondary">No naming conventions.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% include 'inc/paginator.html' with placement='bottom' %}
+  </div>
+{% endblock %}
