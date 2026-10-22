@@ -1,0 +1,32 @@
+{
+  "version": "1.10.0",
+  "source": "https://github.com/lsbarro2026/claude-todo.git",
+  "ref": "v1.10.0",
+  "commit": "85abd556ca693abe7ecd56268050ccffe02850de",
+  "installed_at": "2026-10-22T09:54:45-07:00",
+  "managed": [
+    ".claude/todo-lock.py",
+    ".claude/todo-release-signers",
+    ".claude/skills/admin-task/SKILL.md",
+    ".claude/skills/finish/SKILL.md",
+    ".claude/skills/initiate/SKILL.md",
+    ".claude/skills/optimize/SKILL.md",
+    ".claude/skills/plan-todo/SKILL.md",
+    ".claude/skills/reorder/SKILL.md",
+    ".claude/skills/repair/SKILL.md",
+    ".claude/skills/stack/SKILL.md",
+    ".claude/skills/summary/SKILL.md",
+    ".claude/skills/sync/SKILL.md",
+    ".claude/skills/todo-expanded/SKILL.md",
+    ".claude/skills/todo/SKILL.md",
+    ".claude/skills/update/SKILL.md",
+    ".claude/skills/work-admin-task/SKILL.md",
+    ".claude/skills/plan-todo/todo-planning-reference.md",
+    ".claude/skills/reorder/todo-reorder-reference.md",
+    ".claude/skills/todo-expanded/todo-expanded-reference.md",
+    ".claude/skills/todo/todo-filing-reference.md",
+    ".claude/skills/todo/todo-prompting-guide.md",
+    ".claude/agents/todo-filer.md",
+    ".claude/agents/todo-scout.md"
+  ]
+}

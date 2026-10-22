@@ -1,0 +1,10 @@
+{
+  "worktree": {
+    "baseRef": "head"
+  },
+  "permissions": {
+    "allow": [
+      "Bash(python3 .claude/todo-lock.py *)"
+    ]
+  }
+}
