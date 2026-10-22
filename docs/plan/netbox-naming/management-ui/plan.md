@@ -6,8 +6,7 @@ engine fixed in [`../core/plan.md`](../core/plan.md) (cited as *core plan*).
 
 ## Status
 
-**Approved** (2026-10-22). Draft → Approved → Implemented. The last implementation item (M3) sets
-Implemented.
+**Implemented** (2026-10-22, M3 / FEAT-13). Draft → Approved → Implemented.
 
 ## Decision
 
@@ -272,3 +271,16 @@ Implementation items record any departure from this plan here.
   `APIViewTestCases`, the `get_serializer_for_model` check and the invalid-template, choice-field and
   filter checks. It adds `api_list_objects` to `tests/query_counts.json`. NetBox's API tests create a
   token, which needs `API_TOKEN_PEPPERS`, so `dev/docker-compose.yml` now sets `API_TOKEN_PEPPER_1`.
+- **M3 (FEAT-13): core's `TemplateError` has no offset attribute.** The position is only in its
+  message ("… at position N"), so `preview.py` reads it from there to highlight the offending token;
+  an error without a position (empty template, `{tail}` not last) gets the message but no highlight.
+  No core change was made.
+- **M3: 403/404 partials need an htmx swap override.** htmx 2 doesn't swap 4xx responses by default,
+  so the widget's region and button carry `hx-on::before-swap` to show the permission message.
+- **M3: preview details the plan left open.** Clean errors keyed on `template` stop the sample run;
+  others (no role or device type, a stray tail length) are shown and the run still happens. Static and
+  tail conventions show one value, not five. The location hint reads "Needs a Location…" so it fits the
+  detail panel, which has no picker. The panel template is `inc/sample_values_panel.html`.
+- **M3: package data includes template subdirectories.** `pyproject.toml` adds
+  `templates/netbox_naming/*/*.html` for `widgets/` and `inc/` (the latter already held
+  `proposal_cell.html`).

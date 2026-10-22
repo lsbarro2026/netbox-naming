@@ -14,6 +14,7 @@ from utilities.forms.rendering import FieldSet
 from .choices import CounterScopeChoices, KindChoices, TargetFieldChoices
 from .generator import MAX_COUNT
 from .models import NamingConvention
+from .widgets import TemplateInput
 
 __all__ = (
     "GenerateForm",
@@ -26,12 +27,28 @@ __all__ = (
 class NamingConventionForm(PrimaryModelForm):
     role = DynamicModelChoiceField(queryset=DeviceRole.objects.all(), required=False)
     device_type = DynamicModelChoiceField(queryset=DeviceType.objects.all(), required=False)
+    # Preview-only: never saved.
+    preview_location = DynamicModelChoiceField(
+        queryset=Location.objects.all(),
+        required=False,
+        label="Location",
+        help_text="Gives the Site and Location tokens a value in the preview.",
+    )
+    preview_tail = forms.CharField(
+        required=False, label="Sample tail", help_text="For custom-tail conventions."
+    )
 
     fieldsets = (
         FieldSet("name", "kind", "target_field", "template", "description", "owner", "tags", name="Convention"),
         FieldSet("role", "device_type", name="Applies to"),
         FieldSet("counter_scope", "tail_max_length", name="Numbering"),
+        FieldSet("preview_location", "preview_tail", name="Preview"),
     )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance.pk:
+            self.fields["template"].widget.attrs["data-pk"] = self.instance.pk
 
     class Meta:
         model = NamingConvention
@@ -49,6 +66,7 @@ class NamingConventionForm(PrimaryModelForm):
             "comments",
             "tags",
         )
+        widgets = {"template": TemplateInput}
         help_texts = {
             "kind": "Static: a fixed name. Numbered: includes one <code>#</code> run. "
             "Custom tail: ends in <code>{tail}</code>, typed by the user.",

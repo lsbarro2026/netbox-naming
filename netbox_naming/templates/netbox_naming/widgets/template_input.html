@@ -1,0 +1,28 @@
+{% include "django/forms/widgets/input.html" %}
+<details class="mt-1 small">
+  <summary class="text-secondary">Available tokens</summary>
+  <p class="mb-0">
+    {% for token in widget.tokens %}<code>{{ "{" }}{{ token }}{{ "}" }}</code>{% if not forloop.last %} {% endif %}{% endfor %}
+    · <code>#</code> for the number run
+  </p>
+</details>
+<div class="mt-2">
+  {# Inside the edit form, so htmx posts every form input, the CSRF token included. #}
+  {# htmx doesn't swap 4xx responses by default; the 403/404 partials say what's missing. #}
+  <div id="{{ widget.attrs.id }}-preview"
+       aria-live="polite"
+       hx-post="{% url 'plugins:netbox_naming:namingconvention_preview' %}"
+       hx-trigger="load, keyup changed delay:500ms from:#{{ widget.attrs.id }}, change from:closest form"
+       hx-sync="closest form:abort"
+       hx-on::before-swap="if ([403, 404].includes(event.detail.xhr.status)) { event.detail.shouldSwap = true; event.detail.isError = false; }"
+       {% if widget.pk %}hx-vals='{"pk": "{{ widget.pk }}"}'{% endif %}></div>
+  <button type="button"
+          class="btn btn-sm btn-outline-secondary mt-1"
+          hx-post="{% url 'plugins:netbox_naming:namingconvention_preview' %}"
+          hx-target="#{{ widget.attrs.id }}-preview"
+          hx-sync="closest form:abort"
+          hx-on::before-swap="if ([403, 404].includes(event.detail.xhr.status)) { event.detail.shouldSwap = true; event.detail.isError = false; }"
+          {% if widget.pk %}hx-vals='{"pk": "{{ widget.pk }}"}'{% endif %}>
+    Refresh preview
+  </button>
+</div>
