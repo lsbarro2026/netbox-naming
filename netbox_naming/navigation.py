@@ -20,8 +20,14 @@ generate_item = PluginMenuItem(
     permissions=["netbox_naming.view_namingconvention", "dcim.view_device"],
 )
 
+inventory_item = PluginMenuItem(
+    link="plugins:netbox_naming:inventory",
+    link_text="Inventory",
+    permissions=["netbox_naming.view_namingconvention", "dcim.view_device"],
+)
+
 menu = PluginMenu(
     label="Naming",
-    groups=(("Conventions", (conventions_item,)), ("Generator", (generate_item,))),
+    groups=(("Conventions", (conventions_item,)), ("Generator", (generate_item, inventory_item))),
     icon_class="mdi mdi-label-outline",
 )
