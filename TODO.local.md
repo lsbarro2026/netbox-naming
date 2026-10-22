@@ -111,7 +111,7 @@
 - **Plan:** full.
 - **Route:** judgment
 
-### FEAT-14 — [BLOCKED: FEAT-5] name-generator: Generator service (inventory and next-N preview)
+### FEAT-14 — [BLOCKED: FEAT-10] [BLOCKED: FEAT-5] name-generator: Generator service (inventory and next-N preview)
 - **What:** Implement breakdown G1 of `docs/plan/netbox-naming/name-generator/plan.md`: `netbox_naming/generator.py` with `series_pattern`, `collapse_ranges`, `inventory` (series per counter scope and captured token text, taken ranges, highest, honest next free via `engine.preview`) and `generate` (name and asset_tag pairing via `Proposal.parts` or a separate preview, count clamped to 1..50, errors as messages). Read-only: never import `allocate`.
 - **Binding plan:** plan.md is binding. Record any departure under its Deviations section. The plan docs stay in place; never delete or archive them.
 - **Why:** the generator pages (G2, G3) are thin views over this service; keeping it read-only is the segment's core invariant.
