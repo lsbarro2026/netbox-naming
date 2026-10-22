@@ -16,18 +16,7 @@
 - **Plan:** full.
 - **Source:** /todo-expanded, 2026-10-22.
 - **Route:** judgment
-### FEAT-12 — management-ui: Naming convention REST API
-- **What:** Implement breakdown M2 of `docs/plan/netbox-naming/management-ui/plan.md`: `NamingConventionSerializer`, `NamingConventionViewSet` with the filterset, and the `NetBoxRouter` in `api/urls.py`, so the API, event rules and webhooks work.
-- **Binding plan:** plan.md is binding. Record any departure under its Deviations section. The plan docs stay in place; never delete or archive them.
-- **Why:** event rules serialize objects via `get_serializer_for_model()` and fail without a plugin serializer (research F9).
-- **Files:** `netbox_naming/api/__init__.py`, `netbox_naming/api/serializers.py`, `netbox_naming/api/views.py`, `netbox_naming/api/urls.py`, `netbox_naming/tests/test_api.py`.
-- **Docs:** docs/plan/netbox-naming/management-ui/plan.md#m2-rest-api
-- **Acceptance:** API tests pass; `get_serializer_for_model(NamingConvention)` resolves; full suite green.
-- **Out of scope:** GraphQL, UI changes, model/engine changes.
-- **Plan:** full.
-- **Route:** routine
-
-### FEAT-13 — [BLOCKED: FEAT-12] management-ui: Live template editor and sample values
+### FEAT-13 — management-ui: Live template editor and sample values
 - **What:** Implement breakdown M3 of `docs/plan/netbox-naming/management-ui/plan.md`: `preview.py` (parse → `clean()` → `engine.preview` with shape-mode fallback), the `TemplateInput` htmx widget, preview-only form fields, the hand-secured `TemplatePreviewView` (permission gate per plan Decision 4), the detail page's `SampleValuesPanel`, and their templates. Then set plan.md's Status to Implemented.
 - **Binding plan:** plan.md is binding. Record any departure (including any gap in core's API from plan §Consumed core surface) under its Deviations section. This is the last item: set Status to Implemented. The plan docs stay in place; never delete or archive them.
 - **Why:** the request asks for an intuitive editor: unknown tokens flagged inline and a live sample render.
