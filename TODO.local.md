@@ -95,7 +95,7 @@
 - **Plan:** full.
 - **Route:** judgment
 
-### FEAT-11 — [BLOCKED: FEAT-4] management-ui: Naming convention CRUD pages and menu
+### FEAT-11 — [BLOCKED: FEAT-9] [BLOCKED: FEAT-4] management-ui: Naming convention CRUD pages and menu
 - **What:** Implement breakdown M1 of `docs/plan/netbox-naming/management-ui/plan.md`: filterset, model/filter/import forms (plain template input, no preview fieldset yet), table, generic list/detail/edit/delete/bulk-import/bulk-delete views with the declared list `actions`, `SimpleLayout` detail page without the sample panel, `urls.py`, the "Naming" `PluginMenu`, and `search.py`.
 - **Binding plan:** plan.md is binding. Record any departure under its Deviations section. The plan docs stay in place; never delete or archive them.
 - **Why:** this is the plugin's own page where users store and manage naming conventions (overview Request).
