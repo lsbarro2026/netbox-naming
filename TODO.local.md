@@ -16,18 +16,7 @@
 - **Plan:** full.
 - **Source:** /todo-expanded, 2026-10-22.
 - **Route:** judgment
-### FEAT-8 — core: Template grammar and token registry
-- **What:** Implement breakdown B2 of `docs/plan/netbox-naming/core/plan.md`: the whitelist template parser (literals, `{token}`, one `#`-run of width 1–9, `{tail}` last, no escapes), the token registry from the plan's table, and the `NamingError` exception hierarchy.
-- **Binding plan:** plan.md is binding. Record any departure under its Deviations section. The plan docs stay in place; never delete or archive them.
-- **Why:** the model's `clean()` (B3) and the engine (B4) both parse templates; rendering must never evaluate user input (research F6).
-- **Files:** `netbox_naming/templating.py`, `netbox_naming/exceptions.py`, `netbox_naming/tests/test_templating.py`.
-- **Docs:** docs/plan/netbox-naming/core/plan.md#b2-template-grammar-and-token-registry
-- **Acceptance:** parser/registry `SimpleTestCase` tests pass, including every rejection rule and the F6 injection strings; no `str.format`, `format_map`, `string.Template` or Jinja2 in the module.
-- **Out of scope:** counters, preview/allocate, models.
-- **Plan:** full.
-- **Route:** standard
-
-### FEAT-9 — [BLOCKED: FEAT-8] core: NamingConvention and NamingCounter models and migration
+### FEAT-9 — core: NamingConvention and NamingCounter models and migration
 - **What:** Implement breakdown B3 of `docs/plan/netbox-naming/core/plan.md`: `choices.py`, `NamingConvention(PrimaryModel)` with the plan's fields, constraints and `clean()` rules, `NamingCounter(models.Model)`, and `0001_initial` generated with `makemigrations` in the dev container.
 - **Binding plan:** plan.md is binding. Record any departure under its Deviations section. The plan docs stay in place; never delete or archive them.
 - **Why:** `management-ui` and `name-generator` build against this model (overview Contracts).
