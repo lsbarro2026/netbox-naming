@@ -20,7 +20,7 @@
 - **Source:** /todo-expanded, 2026-10-22.
 - **Route:** judgment
 
-### FEAT-6 — [BLOCKED: FEAT-13] [BLOCKED: FEAT-10] [BLOCKED: FEAT-5] netbox-naming: Acceptance
+### FEAT-6 — [BLOCKED: FEAT-16] [BLOCKED: FEAT-13] [BLOCKED: FEAT-10] [BLOCKED: FEAT-5] netbox-naming: Acceptance
 - **What:** Check `netbox-naming` end to end against the original request in `docs/plan/netbox-naming/overview.md` ("Request"), once every segment has landed. Turn each clause of the request into an observable check. At minimum: the plugin has its own page in NetBox; static, auto-numbered and custom-tail conventions can be created; an access-point-role convention `{room}-{asset_tag}` with an asset-tag convention `ap##` (globally scoped) renders correctly, with `{room}` taken from the device's Location; the existing asset tags list is readable; generating the next 5 APs shows 5 correct names and uses up no numbers. Run the test suite, then exercise the feature in a running NetBox. Write the results to `docs/plan/netbox-naming/acceptance.md`: each check, pass/fail, and the evidence. File every gap as its own bug through `/plan-todo`'s spin-off protocol (`.claude/skills/plan-todo/todo-planning-reference.md`, "Spinning off work"), not fixed inline.
 - **Why:** each segment was verified against its own plan; this checks that together they deliver what was asked.
 - **Request:** "Hello, I would like you to build a netbox plugin for naming conventions".
@@ -110,3 +110,39 @@
 - **Out of scope:** calling `allocate`; generator pages (FEAT-5); model/engine changes.
 - **Plan:** full.
 - **Route:** judgment
+
+### FEAT-14 — [BLOCKED: FEAT-10] [BLOCKED: FEAT-5] name-generator: Generator service (inventory and next-N preview)
+- **What:** Implement breakdown G1 of `docs/plan/netbox-naming/name-generator/plan.md`: `netbox_naming/generator.py` with `series_pattern`, `collapse_ranges`, `inventory` (series per counter scope and captured token text, taken ranges, highest, honest next free via `engine.preview`) and `generate` (name and asset_tag pairing via `Proposal.parts` or a separate preview, count clamped to 1..50, errors as messages). Read-only: never import `allocate`.
+- **Binding plan:** plan.md is binding. Record any departure under its Deviations section. The plan docs stay in place; never delete or archive them.
+- **Why:** the generator pages (G2, G3) are thin views over this service; keeping it read-only is the segment's core invariant.
+- **Files:** `netbox_naming/generator.py`, `netbox_naming/tests/test_generator.py`.
+- **Docs:** docs/plan/netbox-naming/name-generator/plan.md#g1-generator-service
+- **Acceptance:** generator tests in plan.md's Test strategy pass, including `NamingCounter` rows unchanged after `inventory` and `generate`; full `netbox_naming` suite green.
+- **Out of scope:** views, templates, navigation; changing core's engine or model.
+- **Plan:** full.
+- **Route:** judgment
+- **Route:** judgment
+
+### FEAT-15 — [BLOCKED: FEAT-11] [BLOCKED: FEAT-14] name-generator: Generate names page
+- **What:** Implement breakdown G2 of `docs/plan/netbox-naming/name-generator/plan.md`: `GenerateForm` in `forms.py`, GET-only `GenerateNamesView` at `generate/` (POST returns 405), the Generator menu group with its Generate item, `templates/netbox_naming/generate_names.html`, and the generate cases in `tests/test_generator_views.py`. Edits to the shared `forms.py`, `views.py`, `urls.py` and `navigation.py` are additive only.
+- **Binding plan:** plan.md is binding. Record any departure under its Deviations section. The plan docs stay in place; never delete or archive them.
+- **Why:** "If I wanted to see what the next 5 APs would be called, I can generate their names."
+- **Files:** `netbox_naming/forms.py`, `netbox_naming/views.py`, `netbox_naming/urls.py`, `netbox_naming/navigation.py`, `netbox_naming/templates/netbox_naming/generate_names.html`, `netbox_naming/tests/test_generator_views.py`.
+- **Docs:** docs/plan/netbox-naming/name-generator/plan.md#g2-generate-names-page
+- **Acceptance:** view tests pass (permission matrix, hidden ids treated as absent, POST 405, menu gating); the "next 5" browser check in the dev NetBox passes and re-running shows the same values; full suite green.
+- **Out of scope:** the inventory pages (G3); allocating or assigning names.
+- **Plan:** full.
+- **Route:** standard
+- **Route:** standard
+
+### FEAT-16 — [BLOCKED: FEAT-15] name-generator: Inventory pages
+- **What:** Implement breakdown G3 of `docs/plan/netbox-naming/name-generator/plan.md`: `NameInventoryListView` at `inventory/`, the Inventory tab on the convention detail page (`register_model_view(NamingConvention, "inventory")` with a `ViewTab`), the Inventory menu item, `templates/netbox_naming/name_inventory.html`, `templates/netbox_naming/namingconvention_inventory.html`, and the inventory cases in `tests/test_generator_views.py`. Edits to shared files are additive only.
+- **Binding plan:** plan.md is binding. Record any departure under its Deviations section. The plan docs stay in place; never delete or archive them. This is the last name-generator implementation item: set plan.md's Status to **Implemented**.
+- **Why:** "The user should be able to see an intuitive list of the existing asset tags."
+- **Files:** `netbox_naming/views.py`, `netbox_naming/urls.py`, `netbox_naming/navigation.py`, `netbox_naming/templates/netbox_naming/name_inventory.html`, `netbox_naming/templates/netbox_naming/namingconvention_inventory.html`, `netbox_naming/tests/test_generator_views.py`, `docs/plan/netbox-naming/name-generator/plan.md`.
+- **Docs:** docs/plan/netbox-naming/name-generator/plan.md#g3-inventory-pages
+- **Acceptance:** view tests pass (restricted devices not listed, menu gating); the inventory browser check passes; full suite green; plan.md Status reads Implemented.
+- **Out of scope:** CSV export; changing core or management-ui pages beyond additive registration.
+- **Plan:** full.
+- **Route:** standard
+- **Route:** standard
