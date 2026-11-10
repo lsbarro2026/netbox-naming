@@ -1,6 +1,3 @@
-# Per-item git worktrees created by /plan-todo (throwaway checkouts).
-.claude/worktrees/
-
 # Python
 __pycache__/
 *.egg-info/
