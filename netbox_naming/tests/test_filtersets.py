@@ -1,6 +1,10 @@
 from dcim.models import DeviceRole, DeviceType, Manufacturer
 from django.test import TestCase
-from utilities.testing import BaseFilterSetTestMixin
+
+try:
+    from utilities.testing import BaseFilterSetTestMixin
+except ImportError:  # NetBox 4.6 names the same mixin BaseFilterSetTests
+    from utilities.testing import BaseFilterSetTests as BaseFilterSetTestMixin
 
 from netbox_naming.choices import CounterScopeChoices, KindChoices, TargetFieldChoices
 from netbox_naming.filtersets import NamingConventionFilterSet

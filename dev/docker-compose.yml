@@ -4,7 +4,9 @@ x-netbox: &netbox
   build:
     context: ..
     dockerfile: dev/Dockerfile
-  image: netbox-naming-dev:v4.7.3
+    args:
+      NETBOX_VERSION: ${NETBOX_VERSION:-v4.7.3}
+  image: netbox-naming-dev:${NETBOX_VERSION:-v4.7.3}
   depends_on:
     - postgres
     - redis
