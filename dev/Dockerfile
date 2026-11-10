@@ -1,4 +1,5 @@
-FROM netboxcommunity/netbox:v4.7.3
+ARG NETBOX_VERSION=v4.7.3
+FROM netboxcommunity/netbox:${NETBOX_VERSION}
 
 # Editable install of the plugin into the image's venv. docker-compose.yml bind-mounts the repo over
 # /opt/netbox-naming, so the editable install then resolves to the live source tree.

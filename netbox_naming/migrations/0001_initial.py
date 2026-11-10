@@ -11,8 +11,10 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ("dcim", "0251_fix_ltree_cascade_triggers"),
-        ("extras", "0144_customfield_status"),
+        # The latest of each app present in NetBox 4.6.0 (the minimum supported version), so this
+        # migration applies on 4.6.0 through 4.7.x.
+        ("dcim", "0233_device_render_config_permission"),
+        ("extras", "0138_customfieldchoiceset_choice_colors"),
         ("users", "0016_default_ordering_indexes"),
     ]
 
